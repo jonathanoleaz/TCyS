@@ -234,61 +234,66 @@ def interp_seq(seq, n):
     
     return seqa
 
-#convolution of two sequences (dictionaries)
+#ordinary convolution of two sequences (dictionaries) (sequences are not periodic)
 def convolve(seq1, seq2):
     seq_result={}
 
-    #reflect 'any' of the sequences, in this case, the first
+    #reflect 'any' of the sequences, in this case, we selected the first
     seq1a, seq2a = complete_seqs(reflection_seq(seq1), seq2)
 
+    #get the max and mins references of each sequence to do the loops (useful for the limits)
+    n_max_seq1=max(seq1.keys())
+    n_min_seq1=min(seq1.keys())
+
+    n_max_seq2=max(seq2.keys())
+    n_min_seq2=min(seq2.keys())
 
     seq1Keys=seq1a.keys()
-    seq2Keys=seq2a.keys()
+    seq2Keys=seq2a.keys()    
 
-    #get the max and mins references of each sequence to do the loops
-    n_max_seq1=max(seq1Keys)
-    n_min_seq1=min(seq1Keys)
-
-    n_max_seq2=max(seq2Keys)
-    n_min_seq2=min(seq2Keys)
-
-    print 'max1',n_max_seq1
-    print 'max2',n_max_seq2
-
-    print 'min1',n_min_seq1
-    print 'min2',n_min_seq2
-
+    #sort the keys in order to multiply 'pair to pair' the values of the
     keys1 = sorted(seq1Keys)
     keys2 = sorted(seq2Keys)
-    #this variable saves '0' or the 
+    #this variable saves '0' if in the given index there is no value for the sequence, or simply the value if exists
     valorAux=0
+    #'carry' for the sumatory
     saveAdd = 0
-    print seq1a
-    print seq2a
-    for mm in range(-1, abs(n_min_seq2)):
+  
+    #get the values fo the other side of the zero
+    for mm in range(0, abs(n_min_seq1+n_min_seq2)+1):
         saveAdd=0
         for i in range(len(keys1)):
-            #print seq1a[keys1[i]]
-            #print seq2a[keys2[i]]
             if(i+mm < len(keys1)):
                 if(keys1[i+mm] in seq1a):
                     valorAux = seq1a[keys1[i+mm]]
             else:
                 valorAux = 0
             saveAdd = saveAdd + (valorAux*seq2a[keys2[i]])
-            print 'i+mm=', i+mm
-            print 'vAux=', valorAux
-            print 'seq2a=', seq2a[keys2[i]]
-            print '\tsvAdd=', saveAdd
+
         seq_result[mm]=saveAdd
-    print "--",seq_result
 
     #the reflected sequence must be 'displaced' without changing its references
+    for mm in range(0, (n_max_seq1+n_max_seq2)+1):
+        saveAdd=0
+        for i in range(len(keys1)):
+            if(i-mm >= 0):
+                if(keys1[i-mm] in seq1a):
+                    valorAux = seq1a[keys1[i-mm]]
+            else:
+                valorAux = 0
+            saveAdd = saveAdd + (valorAux*seq2a[keys2[i]])
+
+        seq_result[(-1)*mm]=saveAdd
+
+    return reflection_seq(seq_result)
+    
 
 
 if __name__=='__main__':  
-    seq1 = build_dict('1, 0, -4*, 3')
-    seq2 = build_dict('1*, 2, 3')
+    seq1 = build_dict('10, -0.5*, 4, 2, 1, 7')
+    seq2 = build_dict('3, -5*, 0, 1')
+    #seq1 = build_dict('1, 0, -4*, 3')
+    #seq2 = build_dict('1*, 2, 3')
     #auxiliary sequences for operate 
     seq1a, seq2a = complete_seqs(seq1, seq2)
     
@@ -316,5 +321,5 @@ if __name__=='__main__':
 	#displacement of a sequence
     print 'seq1(n)=', build_seq((seq1))
     #displacement of a sequence
-    print 'seq1(4n)=', convolve(seq1, seq2)
+    print 'seq1(4n)=', build_seq(convolve(seq1, seq2))
     #plot_two_sequences(seq1,interp_seq(seq1, 1))

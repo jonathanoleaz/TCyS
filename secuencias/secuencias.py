@@ -286,12 +286,100 @@ def convolve(seq1, seq2):
         seq_result[(-1)*mm]=saveAdd
 
     return reflection_seq(seq_result)
-    
 
+    #convolution of a periodic sequence with a simple sequence.
+    #Note: the periodic sequence must be only one period (not contains "repeated" or periodic values), including in it the value for n=0
+def periodic_convolve(per_seq, seq2):
+    seq_result = {}
+    lenPerSeq = len(per_seq.keys())
+    lenSeq2 = len(seq2.keys())
+
+    rows = lenPerSeq
+    cols = lenSeq2+lenPerSeq-1
+
+    #bidimentional list to save the multiplication "element by element" of the sequences
+    a = [[0 for col in range(cols)] for row in range(rows)]
+
+    seqPerSortedK = sorted(per_seq.keys())
+    seq2SortedK = sorted(seq2.keys())
+    
+    for i in range(len(seqPerSortedK)):
+        for j in range(len(seq2SortedK)):
+            a[i][j+i]=per_seq[seqPerSortedK[i]]*seq2[seq2SortedK[j]]
+
+    for(i) in range(rows):
+        print a[i]
+
+    colsAdd=[]
+    addByColumn=0
+    for j in range(cols):
+        for i in range(rows):
+            addByColumn+=a[i][j]
+        colsAdd.append(addByColumn)
+        addByColumn=0
+
+    finalValues=[0]*len(seqPerSortedK)
+
+    for i in range(len(colsAdd)):
+        finalValues[i%len(seqPerSortedK)] += colsAdd[i]
+
+    for i in range(min(seqPerSortedK) + min (seq2SortedK), min(seqPerSortedK) + min (seq2SortedK)+ len(finalValues)):
+        seq_result[i]=finalValues[i%len(finalValues)]
+
+    return seq_result
+
+    #convolution of a pair of periodic sequences.
+    #Note: the sequence must be only one period (not contains "repeated" or periodic values), including in it the value for n=0
+def circular_convolve(per_seq, seq2):
+    seq_result = {}
+
+    lenPerSeq = len(per_seq.keys())
+    lenSeq2 = len(seq2.keys())
+
+    rows = lenPerSeq
+    cols = lenSeq2+lenPerSeq-1
+
+    #bidimentional list to save the multiplication "element by element" of the sequences
+    a = [[0 for col in range(cols)] for row in range(rows)]
+
+    seqPerSortedK = sorted(per_seq.keys())
+    seq2SortedK = sorted(seq2.keys())
+    
+    for i in range(len(seqPerSortedK)):
+        for j in range(len(seq2SortedK)):
+            a[i][j+i]=per_seq[seqPerSortedK[i]]*seq2[seq2SortedK[j]]
+            print 'per_seq[seqPerSortedK[i]]', per_seq[seqPerSortedK[i]]
+            print 'seq2[seq2SortedK[j]]', seq2[seq2SortedK[j]]
+    for(i) in range(rows):
+        print a[i]
+
+    colsAdd=[]
+    addByColumn=0
+    for j in range(cols):
+        for i in range(rows):
+            addByColumn+=a[i][j]
+        colsAdd.append(addByColumn)
+        addByColumn=0
+
+    maxPeriod=max(len(per_seq.keys()), len(seq2.keys()))
+    print '..',colsAdd
+
+    finalValues=[0]*(len(seqPerSortedK) + maxPeriod%len(seqPerSortedK))
+
+    for i in range(len(colsAdd)):
+        finalValues[i%maxPeriod] += colsAdd[i]
+
+    print 'fVals=',finalValues
+
+    for i in range(min(seqPerSortedK) + min (seq2SortedK), min(seqPerSortedK) + min (seq2SortedK)+ len(finalValues)):
+        seq_result[i]=finalValues[i%len(finalValues)]
+
+
+    return seq_result
 
 if __name__=='__main__':  
-    seq1 = build_dict('10, -0.5*, 4, 2, 1, 7')
-    seq2 = build_dict('3, -5*, 0, 1')
+    seq1 = build_dict('3*, 6, 2')
+    seq2 = build_dict('-1*, 4')
     #seq1 = build_dict('1, 0, -4*, 3')
     #seq2 = build_dict('1*, 2, 3')
     #auxiliary sequences for operate 
@@ -321,5 +409,5 @@ if __name__=='__main__':
 	#displacement of a sequence
     print 'seq1(n)=', build_seq((seq1))
     #displacement of a sequence
-    print 'seq1(4n)=', build_seq(convolve(seq1, seq2))
+    print build_seq(circular_convolve(seq1, seq2))
     #plot_two_sequences(seq1,interp_seq(seq1, 1))

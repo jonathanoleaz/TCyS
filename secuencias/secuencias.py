@@ -378,36 +378,36 @@ def circular_convolve(per_seq, seq2):
     return seq_result
 
 if __name__=='__main__':  
-    seq1 = build_dict('3*, 6, 2')
-    seq2 = build_dict('-1*, 4')
+    seq1 = build_dict('3*, 1, 4, 0, 2, 0')
+    seq2 = build_dict('0.5*, 0.2, 0.3')
     #seq1 = build_dict('1, 0, -4*, 3')
     #seq2 = build_dict('1*, 2, 3')
     #auxiliary sequences for operate 
     seq1a, seq2a = complete_seqs(seq1, seq2)
     
-    """
+    
     #sequence1
     #plot_sequence(seq1)
-    print('sequence1 =', build_seq(seq1a))
+    #print('sequence1 =', build_seq(seq1a))
     #reflection of sequence1
     refl_seq = reflection_seq(seq1)
     #plot_sequence(refl_seq)
-    print('seq1(-n) =', build_seq(refl_seq))
+    #print('seq1(-n) =', build_seq(refl_seq))
     #sequence2
     #plot_sequence(seq2)
-    print('sequence2 =', build_seq(seq2))
+    #print('sequence2 =', build_seq(seq2))
     #operations with sequence1 and sequence2
-    result = basic_operation_seq(seq1a, seq2a, 'mult')
+    #result = basic_operation_seq(seq1a, seq2a, 'mult')
     #plot_sequence(result)
-    print('seq1 * seq2 =', build_seq(result))
+    #print('seq1 * seq2 =', build_seq(result))
 
     #operations with sequence1 and sequence2
-    result = basic_operation_seq(seq1a, seq2a, 'add')
+    #result = basic_operation_seq(seq1a, seq2a, 'add')
     #plot_sequence(result)
-    print('seq1 + seq2 =', build_seq(result))
-	"""
+    #print('seq1 + seq2 =', build_seq(result))
+
 	#displacement of a sequence
-    print 'seq1(n)=', build_seq((seq1))
+    #print 'seq1(n)=', build_seq((seq1))
     #displacement of a sequence
-    print build_seq(circular_convolve(seq1, seq2))
+    print build_seq(convolve(seq1, seq2))
     #plot_two_sequences(seq1,interp_seq(seq1, 1))

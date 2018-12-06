@@ -136,6 +136,8 @@ def plot_two_sequences(seq, seq2):
     xmin = min(index+index2)-1
 
     subplots.axis([xmin, xmax, ymin, ymax])
+    plt.text(0,ymax, build_seq(seq), color='b')
+    plt.text(0,ymax-1, build_seq(seq2), color='g')
     plt.grid(True)
     plt.axhline(y=0, color='r')
     plt.show()
@@ -154,6 +156,7 @@ def ampl_seq(seq, a):
     keys = seq.keys()
     for k in keys:
         new_seq[k] = seq[k] * a
+
     return new_seq
 
 #displacement of a sequence (dictionary)
@@ -161,8 +164,9 @@ def shift_seq(seq, n0):
     displ_seq = {}
     keys = seq.keys()
     for k in keys:
-        displ_seq[k-n0]	= seq[k]
-	return displ_seq
+        displ_seq[k-n0] = seq[k]
+
+    return displ_seq
 
 #decimated "diezmacion" of a sequence (dictionary), quit samples
 def decim_seq(seq, n):
@@ -382,7 +386,7 @@ def circular_convolve(per_seq, seq2):
     return seq_result
 
 if __name__=='__main__':  
-    seq1 = build_dict('3*, 1, 4, 0, 2, 0')
+    seq1 = build_dict('3, 1, 4, 0, -10*, 0.5')
     seq2 = build_dict('0.5*, 0.2, 0.3')
     #seq1 = build_dict('1, 0, -4*, 3')
     #seq2 = build_dict('1*, 2, 3')
@@ -413,5 +417,5 @@ if __name__=='__main__':
 	#displacement of a sequence
     #print 'seq1(n)=', build_seq((seq1))
     #displacement of a sequence
-    print build_seq(convolve(seq1, seq2))
+    print plot_sequence(shift_seq(seq1, 10))
     #plot_two_sequences(seq1,interp_seq(seq1, 1))

@@ -83,16 +83,17 @@ def plot_sequence(seq):
     for k in keys:
         index.append(k)
         values.append(seq[k])
-    #get the limits of the axis plot
-    plt.plot(index, values, 'ro')
+    #get the limits of the axis plot    
+    plt.axvline(x=0, color='r')
+    markerline, stemlines, baseline = plt.stem(index,values, 'b-.', 'bo')
+    plt.axhline(y=0, color='r')
     ymax = max(values)+2
     ymin = min(values)-2
     xmax = max(index)+1
     xmin = min(index)-1
     plt.axis([xmin, xmax, ymin, ymax])
     plt.grid(True)
-    plt.axhline(y=0, color='k')
-    plt.axvline(x=0, color='k')
+
     plt.show()
 
 #plot two sequences (dictionary)
@@ -107,7 +108,8 @@ def plot_two_sequences(seq, seq2):
     #get the limits of the axis plot
     fig,subplots=plt.subplots()
 
-    subplots.plot(index, values, 'ro', alpha=0.5)
+    #subplots.plot(index, values, 'ro', alpha=0.5)
+    markerline, stemlines, baseline = subplots.stem(index,values, 'b-.', 'bo')
     ymax = max(values)+2
     ymin = min(values)-2
     xmax = max(index)+1
@@ -122,26 +124,20 @@ def plot_two_sequences(seq, seq2):
         index2.append(k2)
         values2.append(seq2[k2])
     #get the limits of the axis plot
-    subplots.plot(index2, values2, 'go', alpha=0.5)
+    #subplots.plot(index2, values2, 'go', alpha=0.5)
+    markerline, stemlines, baseline = subplots.stem(index2,values2, 'g-.', 'go')
     #subplots.set_aspect('equal')
-
     fig.tight_layout()
     #adjusting the max and min values of the plot
-    if xmax<max(index2):
-        xmax=max(index2)+2
-    if xmin>min(index2):
-        xmin=min(index2)-2
-    if ymax<max(values2):
-    	ymax=max(values2)+2
-    if ymin>min(values2):
-    	ymin=min(values2)-2
+    ymax = max(values+values2)+2
+    ymin = min(values+values2)-2
+    xmax = max(index+index2)+1
+    xmin = min(index+index2)-1
 
     subplots.axis([xmin, xmax, ymin, ymax])
-    print ymax
     plt.grid(True)
-    plt.axhline(y=0, color='k')
-    plt.axvline(x=0, color='k')
-
+    plt.axhline(y=0, color='r')
+    plt.axvline(x=0, color='r')
     plt.show()
 
 #reflection of a sequence (dictionary) 
@@ -151,6 +147,14 @@ def reflection_seq(seq):
     for k in keys:
         refl_seq[k*(-1)] = seq[k]
     return refl_seq
+
+#amplitude or attenuation of a sequence (dictionary)
+def ampl_seq(seq, a):
+    new_seq = {}
+    keys = seq.keys()
+    for k in keys:
+        new_seq[k] = seq[k] * a
+    return new_seq
 
 #displacement of a sequence (dictionary)
 def shift_seq(seq, n0):

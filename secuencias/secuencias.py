@@ -6,6 +6,7 @@ Created on Fri Nov 30 14:22:42 2018
 """
 import nltk
 import matplotlib.pyplot as plt
+from multiprocessing.dummy import Pool as ThreadPool
 
 #build a dictionary with the sequence (String)
 def build_dict(sequence):
@@ -56,9 +57,9 @@ def build_seq(seq1):
     keys = sorted(seq1.keys())
     for k in keys:
         if k == 0:
-            sequence.append(str(seq1[k])+'*') #the reference
+            sequence.append(str(seq1[k])+'*,') #the reference
         else:
-            sequence.append(str(seq1[k]))
+            sequence.append(str(seq1[k])+',')
     return sequence
 
 #add/substract/multiplication of sequences (dictionaries)
@@ -85,13 +86,14 @@ def plot_sequence(seq):
         values.append(seq[k])
     #get the limits of the axis plot    
     plt.axvline(x=0, color='r')
-    markerline, stemlines, baseline = plt.stem(index,values, 'b-.', 'bo')
+    markerline, stemlines, baseline = plt.stem(index,values, 'y-.', 'yo')
     plt.axhline(y=0, color='r')
     ymax = max(values)+2
     ymin = min(values)-2
     xmax = max(index)+1
     xmin = min(index)-1
     plt.axis([xmin, xmax, ymin, ymax])
+    plt.text(xmin+1, ymax, build_seq(seq), color='y')
     plt.grid(True)
 
     plt.show()
@@ -136,8 +138,8 @@ def plot_two_sequences(seq, seq2):
     xmin = min(index+index2)-1
 
     subplots.axis([xmin, xmax, ymin, ymax])
-    plt.text(0,ymax, build_seq(seq), color='b')
-    plt.text(0,ymax-1, build_seq(seq2), color='g')
+    plt.text(min(index), ymax, build_seq(seq), color='b')
+    plt.text(min(index2),ymax-1, build_seq(seq2), color='g')
     plt.grid(True)
     plt.axhline(y=0, color='r')
     plt.show()
@@ -241,6 +243,75 @@ def interp_seq(seq, n):
                 seqa[keys[i] + pp] = start + ((abs((end-start)/n))*pp)    
     
     return seqa
+
+def interp_seq_To_Zero(seq, n):
+    inter_seq = {}
+    seqa = {}
+    keys = seq.keys()
+
+    #get the values all the values of the sequence but "jumping" over the new sequence, lefting 'n-1' places 
+    for k in keys:
+        seqa[n*k] = seq[k]
+
+    keys = sorted(seqa.keys())
+    j=0
+        #add the left spaces of the sequence
+    #first, get the start and end to calculate the values of the left spaces
+    for i in range(len(keys)):
+        start=seqa[keys[i]]
+        if i+1 < len(keys):
+            end=seqa[keys[i+1]]
+        else:
+            end=0
+
+        j=j+1
+
+        for pp in range(1, n):
+            if(end>start):
+                seqa[keys[i] + pp] = 0
+
+            if(end<start):
+                seqa[keys[i] + pp] = 0 
+
+            if(end==start):
+                seqa[keys[i] + pp] = 0  
+    
+    return seqa
+
+def interp_seq_To_Step(seq, n):
+    inter_seq = {}
+    seqa = {}
+    keys = seq.keys()
+
+    #get the values all the values of the sequence but "jumping" over the new sequence, lefting 'n-1' places 
+    for k in keys:
+        seqa[n*k] = seq[k]
+
+    keys = sorted(seqa.keys())
+    j=0
+        #add the left spaces of the sequence
+    #first, get the start and end to calculate the values of the left spaces
+    for i in range(len(keys)):
+        start=seqa[keys[i]]
+        if i+1 < len(keys):
+            end=seqa[keys[i+1]]
+        else:
+            end=0
+
+        j=j+1
+
+        for pp in range(1, n):
+            if(end>start):
+                seqa[keys[i] + pp] = start
+
+            if(end<start):
+                seqa[keys[i] + pp] = start 
+
+            if(end==start):
+                seqa[keys[i] + pp] = start  
+    
+    return seqa
+
 
 #ordinary convolution of two sequences (dictionaries) (sequences are not periodic)
 def convolve(seq1, seq2):
@@ -417,5 +488,5 @@ if __name__=='__main__':
 	#displacement of a sequence
     #print 'seq1(n)=', build_seq((seq1))
     #displacement of a sequence
-    print plot_sequence(shift_seq(seq1, 10))
+    print plot_sequence(interp_seq_To_Step(seq1, 3))
     #plot_two_sequences(seq1,interp_seq(seq1, 1))

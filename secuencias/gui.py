@@ -6,72 +6,102 @@ Created on December 5, 2018
 """
 from Tkinter import *
 import tkMessageBox
-
+import time
 import datetime
 from secuencias import *
 
-def btnAction():
-	index = tkvar.get()
-	seq1 = build_dict(txtLocalFile.get())
-	seq2 = build_dict(txtRemFile.get())
 
-	seq1a, seq2a = complete_seqs(seq1, seq2)
+def change_dropdown(*args):
+    print( tkvar.get() )
+    optionSelected = tkvar.get()
+    if (tkvar.get() == 'Amplificacion/Atenuacion' or tkvar.get() == 'Diezmacion' or tkvar.get() == 'Desplazamiento' \
+        or tkvar.get() == 'Reflejo' or tkvar.get() == 'Interpolacion' or tkvar.get() == 'Interpolacion a cero' \
+        or tkvar.get() == 'Interpolacion a escalon'):
+        lbl2.config(state='disabled') 
+        txtRemFile.config(state='disabled')
+        lbl3.config(state='normal')
+        w.config(state='normal')
+    else:
+        lbl2.config(state='normal') 
+        txtRemFile.config(state='normal')
+        lbl3.config(state='disabled')
+        w.config(state='disabled')
 
-	factor = float(w.get())
-	plotMode=0			#if plotMode==1, the plot only seq1 and seqRes
-	if index =='Mutiplicacion':
-		seqRes = basic_operation_seq(seq1a, seq2a, 'mult')
 
-	if index =='Suma':
-		seqRes = basic_operation_seq(seq1a, seq2a, 'add')
-		print 'sumando'
+def btnAction(which):
+    index = tkvar.get()
+    seq1 = build_dict(txtLocalFile.get())
+    seq2 = build_dict(txtRemFile.get())
 
-	if index =='Resta':
-		seqRes = basic_operation_seq(seq1a, seq2a, 'sub')
+    seq1a, seq2a = complete_seqs(seq1, seq2)
 
-	if index =='Amplificacion/Atenuacion':
-		seqRes = ampl_seq(seq1, factor)
-		plotMode=1
+    factor = float(w.get())
+    plotMode=0			#if plotMode==1, the plot only seq1 and seqRes
 
-	if index =='Desplazamiento':
-		seqRes = shift_seq(seq1, factor)
-		plotMode=1
+    if index =='Mutiplicacion':
+        seqRes = basic_operation_seq(seq1a, seq2a, 'mult')
 
-	if index =='Reflejo':
-		seqRes = reflection_seq(seq1)
-		plotMode=1
+    elif index =='Suma':
+        seqRes = basic_operation_seq(seq1a, seq2a, 'add')
+        print 'sumando'
 
-	if index =='Diezmacion':
-		seqRes = decim_seq(seq1, factor)
-		plotMode=1
+    elif index =='Resta':
+        seqRes = basic_operation_seq(seq1a, seq2a, 'sub')
 
-	if index =='Interpolacion':
-		seqRes = interp_seq(seq1, int(factor))
-		plotMode=1
+    elif index =='Amplificacion/Atenuacion':
+        seqRes = ampl_seq(seq1, factor)
+        plotMode=1
 
-	if index =='Convolucion ordinaria':
-		seqRes = convolve(seq1, seq2)
+    elif index =='Desplazamiento':
+        seqRes = shift_seq(seq1, factor)
+        plotMode=1
 
-	if index =='Convolucion periodica':
-		seqRes = periodic_convolve(seq1, seq2)	
+    elif index =='Reflejo':
+        seqRes = reflection_seq(seq1)
+        plotMode=1
 
-	if index =='Convolucion circular':
-		seqRes = circular_convolve(seq1, seq2)	
+    elif index =='Diezmacion':
+        seqRes = decim_seq(seq1, factor)
+        plotMode=1
 
-	lblRes.config(text=build_seq(seqRes))	
+    elif index =='Interpolacion':
+        seqRes = interp_seq(seq1, int(factor))
+        plotMode=1
 
-	if plotMode==1:
-		plot_two_sequences(seq1, seqRes)
+    elif index =='Interpolacion a cero':
+        seqRes = interp_seq_To_Zero(seq1, int(factor))
+        plotMode=1 
 
-	else:
-		plot_two_sequences(seq1, seq2)
-		plot_sequence(seqRes)
+    elif index =='Interpolacion a escalon':
+        seqRes = interp_seq_To_Step(seq1, int(factor))
+        plotMode=1 
 
+    elif index =='Convolucion ordinaria':
+        seqRes = convolve(seq1, seq2)
+
+    elif index =='Convolucion periodica':
+        seqRes = periodic_convolve(seq1, seq2)	
+
+    elif index =='Convolucion circular':
+        seqRes = circular_convolve(seq1, seq2)	
+
+    lblRes.config(text=build_seq(seqRes))	
+
+    if plotMode==1:
+        plot_two_sequences(seq1, seqRes)
+
+    else:
+        if(which==1):
+            plot_two_sequences(seq1, seq2)
+        else:
+            plot_sequence(seqRes)
 		
 
 window = Tk()
 window.title("Operaciones con secuencias")
 window.geometry('550x400')
+
+counterOfBtn = 0
 
 lbl = Label(window, text="Ingrese las secuencias y elija una operación del menú:")
 lbl.grid(column=1, row=0, padx=10, pady=10)
@@ -79,7 +109,10 @@ lbl.grid(column=1, row=0, padx=10, pady=10)
 lbl = Label(window, text="f[n] = ")
 lbl.grid(column=0, row=2)
 
-txtLocalFile = Entry(window,width=30)
+defaultText0 = StringVar()
+defaultText0.set('1, 0, 3, 14, 16*, 5, 9')
+
+txtLocalFile = Entry(window,width=30, textvariable = defaultText0)
 txtLocalFile.grid(column=1, row=2, pady=7, sticky=W)
 
 lbl2 = Label(window, text="g[n] = ")
@@ -101,8 +134,9 @@ w.grid(column=1, row=4, pady=7, sticky=W)
 lbl = Label(window, text="Operación:")
 lbl.grid(column=0, row=5, pady=7)
 
-choices = { 'Mutiplicacion','Suma','Resta','Amplificacion/Atenuacion','Desplazamiento',
-	'Reflejo', 'Diezmacion', 'Interpolacion', 'Convolucion ordinaria', 'Convolucion periodica', 'Convolucion circular'}
+choices = ['Mutiplicacion','Suma','Resta','Amplificacion/Atenuacion','Desplazamiento',
+	'Reflejo', 'Diezmacion', 'Interpolacion', 'Interpolacion a cero', 'Interpolacion a escalon','Convolucion ordinaria', 
+    'Convolucion periodica', 'Convolucion circular']
  
 tkvar = StringVar()
 popupMenu = OptionMenu(window, tkvar, *choices)
@@ -111,30 +145,17 @@ popupMenu.grid(row = 5, column =1, sticky=W, pady=7)
 popupMenu.config(bg = "navajowhite")
 
 
-btn = Button(window, text="Mostrar", bg="light slate blue", command=btnAction)
-btn.grid(column=1, row=6)
+btn = Button(window, text="Mostrar", bg="light slate blue", command= lambda: btnAction(1))
+btn.grid(column=1, row=6, sticky=W)
+
+btn2 = Button(window, text="Mostrar 2", bg="light slate blue", command= lambda: btnAction(2))
+btn2.grid(column=1, row=7, sticky=W)
 
 lbl = Label(window, text="Resultado = ")
-lbl.grid(column=0, row=7)
+lbl.grid(column=0, row=8)
 
 lblRes = Label(window, text="")
-lblRes.grid(column=1, row=7, sticky=W)
-
-
-def change_dropdown(*args):
-    print( tkvar.get() )
-    optionSelected = tkvar.get()
-    if (tkvar.get() == 'Amplificacion/Atenuacion' or tkvar.get() == 'Diezmacion' or tkvar.get() == 'Desplazamiento' \
-    	or tkvar.get() == 'Reflejo' or tkvar.get() == 'Interpolacion'):
-    	lbl2.config(state='disabled') 
-    	txtRemFile.config(state='disabled')
-    	lbl3.config(state='normal')
-    	w.config(state='normal')
-    else:
-    	lbl2.config(state='normal') 
-    	txtRemFile.config(state='normal')
-    	lbl3.config(state='disabled')
-    	w.config(state='disabled')
+lblRes.grid(column=1, row=8, sticky=W)
 
 
  

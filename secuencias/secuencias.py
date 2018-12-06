@@ -109,6 +109,7 @@ def plot_two_sequences(seq, seq2):
     fig,subplots=plt.subplots()
 
     #subplots.plot(index, values, 'ro', alpha=0.5)
+    plt.axvline(x=0, color='r')
     markerline, stemlines, baseline = subplots.stem(index,values, 'b-.', 'bo')
     ymax = max(values)+2
     ymin = min(values)-2
@@ -137,7 +138,6 @@ def plot_two_sequences(seq, seq2):
     subplots.axis([xmin, xmax, ymin, ymax])
     plt.grid(True)
     plt.axhline(y=0, color='r')
-    plt.axvline(x=0, color='r')
     plt.show()
 
 #reflection of a sequence (dictionary) 
